@@ -4,7 +4,7 @@ This repository contains MATLAB scripts to measure freezing behavior based on po
 
 - **CheckThresholds**
 
-  This script allows the user to enter video and coordinate information and set freezing thresholds in a GUI. Users can interactively view the video frame-by-frame with freezing labels, as well as a plot of coordinate distance change by frame, to determine optimal thresholds.
+  This script is designed for a contextual fear conditioning paradigm, allowing the user to enter video and coordinate information and set freezing thresholds in a GUI. Users can interactively view the video frame-by-frame with freezing labels, as well as a plot of coordinate distance change by frame, to determine optimal thresholds.
 
   ![Screenshot](https://github.com/bhagwaths/DLC-freezing/blob/master/CheckThresholds/CheckThresholds_example.PNG)
 
