@@ -86,6 +86,8 @@ function analyze_freezing(input)
         last_s = 300;
     elseif strcmp(input.stage,'extinction')
         last_s = 2250;
+    elseif strcmp(input.stage,'retrieval')
+        last_s = 450;
     end
     
     frames_col = [0; frames_col];
