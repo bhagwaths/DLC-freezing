@@ -1,10 +1,10 @@
 # DLC-freezing
 
-This repository contains MATLAB scripts to measure freezing behavior based on pose coordinates from [DeepLabCut](https://github.com/DeepLabCut/DeepLabCut).
+This repository contains MATLAB scripts to measure freezing or struggling behavior based on pose coordinates from [DeepLabCut](https://github.com/DeepLabCut/DeepLabCut).
 
 - **CheckThresholds**
 
-  This script is designed for a contextual fear conditioning paradigm, allowing the user to enter video and coordinate information and set freezing thresholds in a GUI. Users can interactively view the video frame-by-frame with freezing labels, as well as a plot of coordinate distance change by frame, to determine optimal thresholds.
+  This script allows the user to enter video and coordinate information and set thresholds in a GUI. Users can interactively view the video frame-by-frame with behavior labels and plot coordinate distance change by frame to determine optimal thresholds.
 
   ![Screenshot](https://github.com/bhagwaths/DLC-freezing/blob/master/CheckThresholds/CheckThresholds_example.PNG)
 
