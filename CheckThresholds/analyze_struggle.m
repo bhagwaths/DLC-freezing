@@ -5,15 +5,16 @@ function analyze_struggle(input)
 
     % Read data
     data = readtable(input.coord_file);
+    [~, data_header] = xlsread(input.coord_file);
     frames = data(:,1);
 
     % Coordinates
-    coord = data(:,[2:3, 5:6, 8:9]);
-    coord.Properties.VariableNames = ["headcap_x", "headcap_y", "leftear_x", "leftear_y", "rightear_x", "rightear_y"];
+    coord_cols = strcmp(data_header(3,:),"x") | strcmp(data_header(3,:),"y");
+    coord = data(:,coord_cols);
 
     % Probabilities
-    prob = data(:,[4,7,10]);
-    prob.Properties.VariableNames = ["headcap", "leftear", "rightear"];
+    prob_cols = strcmp(data_header(3,:),"likelihood");
+    prob = data(:,prob_cols);
     prob(1,:) = []; % remove first frame (cannot calculate distance for this frame)
 
     % Calculate Euclidean distances
@@ -27,7 +28,6 @@ function analyze_struggle(input)
         dist = [dist, curr_dist];
     end
     dist = array2table(dist);
-    dist.Properties.VariableNames = ["headcap", "leftear", "rightear"];
 
     % Replace low prob distances with NaN
     dist{:,:}(prob{:,:} <= 0.5) = NaN; % Replace coords with likelihood of <= 0.5 with NaN
@@ -55,7 +55,7 @@ function analyze_struggle(input)
     struggle_end = ep_end(struggle_ep_idx);
     struggle_idx = zeros(size(ep_idx));
     for i=1:numel(struggle_start)
-        struggle_idx(struggle_start(i):struggle_end(i)) = 1;
+        struggle_idx(struggle_start(i)+1:struggle_end(i)) = 1;
     end
 
     frames_col = frames{:,:}(2:end,:);
@@ -85,8 +85,9 @@ function analyze_struggle(input)
     frames_col = [0; frames_col];
     struggling_col = struggle_idx * 100;
     struggling_col = [0; struggling_col];
-    output_table = array2table([frames_col, struggling_col]);
-    output_table.Properties.VariableNames = ["Frames", "Struggling"];
+    smooth_dist_col = [0; smooth_mean_dist];
+    output_table = array2table([frames_col, struggling_col, smooth_dist_col]);
+    output_table.Properties.VariableNames = ["Frames", "Struggling", "Distance"];
     
     output_file_name = sprintf('%s_DLC_struggling.csv', input.name);
     writetable(output_table,output_file_name);

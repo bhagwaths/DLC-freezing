@@ -5,15 +5,16 @@ function analyze_freezing(input)
 
     % Read data
     data = readtable(input.coord_file);
+    [~, data_header] = xlsread(input.coord_file);
     frames = data(:,1);
     
     % Coordinates
-    coord = data(:,[2:3, 5:6, 8:9, 11:12]);
-    coord.Properties.VariableNames = ["nose_x", "nose_y", "leftear_x", "leftear_y",...
-                                        "rightear_x", "rightear_y", "tailbase_x", "tailbase_y"];
+    coord_cols = strcmp(data_header(3,:),"x") | strcmp(data_header(3,:),"y");
+    coord = data(:,coord_cols);
+
     % Probabilities
-    prob = data(:,[4,7,10,13]);
-    prob.Properties.VariableNames = ["nose", "leftear", "rightear", "tailbase"];
+    prob_cols = strcmp(data_header(3,:),"likelihood");
+    prob = data(:,prob_cols);
     prob(1,:) = []; % remove first frame (cannot calculate distance for this frame)
     
     % Calculate Euclidean distances
@@ -27,7 +28,6 @@ function analyze_freezing(input)
         dist = [dist, curr_dist];
     end
     dist = array2table(dist);
-    dist.Properties.VariableNames = ["nose", "leftear", "rightear", "tailbase"];
     
     % Replace low prob distances with NaN
     dist{:,:}(prob{:,:} <= 0.5) = NaN; % Replace coords with likelihood of <= 0.5 with NaN
@@ -82,7 +82,9 @@ function analyze_freezing(input)
     redraw(1, vid, freeze_idx, 'freezing');
     
     % Export freezing data to CSV
-    if strcmp(input.stage,'conditioning')
+    if ~contains(fieldnames(input),'stage')
+        last_s = NaN;
+    elseif strcmp(input.stage,'conditioning')
         last_s = 300;
     elseif strcmp(input.stage,'extinction')
         last_s = 2250;
@@ -96,7 +98,11 @@ function analyze_freezing(input)
     freezing_col = [0; freezing_col];
     output_table = array2table([frames_col, freezing_col]);
     output_table.Properties.VariableNames = ["Frames", "Freezing"];
-    output_table = output_table(output_table.Frames <= (input.FPS * last_s), :);
-    
-    output_file_name = sprintf('%s_%s_DLC_freezing.csv', input.name, input.stage);
+
+    if ~isnan(last_s)
+        output_table = output_table(output_table.Frames <= (input.FPS * last_s), :);
+        output_file_name = sprintf('%s_%s_DLC_freezing.csv', input.name, input.stage);
+    else
+        output_file_name = sprintf('%s_DLC_freezing.csv', input.name);
+    end
     writetable(output_table,output_file_name);
