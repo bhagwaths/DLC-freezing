@@ -128,10 +128,14 @@ function input_GUI
     % Runs DLC analysis after pressing button
     function analysis(src, ~)
         input = guidata(src);
-        if input.freezing
+        if ~contains(fieldnames(input),'freezing')
             analyze_freezing(input);
-        elseif input.struggling
-            analyze_struggle(input);
+        else
+            if input.freezing
+                analyze_freezing(input);
+            elseif input.struggling
+                analyze_struggle(input);
+            end
         end
     end
 end
